@@ -58,7 +58,7 @@ module.exports = class Streamer {
         command.audioFrequency(44100);
 
         command.format("flv");
-        command.output(`rtmp:localhost/streams/${this.guildId}`);
+        command.output(`rtmp:${process.env.IP}/streams/${this.guildId}`);
 
         return command;
     }
