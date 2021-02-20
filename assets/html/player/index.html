@@ -1,0 +1,345 @@
+<html>
+    <head>
+        <title>Lacu Player</title>
+        <meta content="This is the video player in which requested videos are played." name="description" />
+        <link href="/icon_small.png" rel="icon" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <script src="//cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <script src="//cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/p2p-media-loader-core@latest/build/p2p-media-loader-core.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/p2p-media-loader-hlsjs@latest/build/p2p-media-loader-hlsjs.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+        <script
+                src="//cdn.jsdelivr.net/npm/clappr-flvjs-playback@latest/dist/clappr-flvjs-playback.min.js"
+                type="text/javascript"
+        ></script>
+        <script
+                src="//cdn.jsdelivr.net/gh/video-dev/clappr-rtmp-plugin@latest/dist/rtmp.min.js"
+                type="text/javascript"
+        ></script>
+
+        <style>
+            html,
+            body,
+            #player {
+                margin: unset;
+                height: 100% !important;
+                width: 100% !important;
+                background: black !important;
+                color: white;
+                font-style: normal;
+                font-weight: 400;
+                font-size: 100%;
+                font-family: Roboto, Open Sans, Arial, sans-serif;
+            }
+
+            .jw-aspect.jw-reset {
+                height: 100vh;
+                padding: unset !important;
+            }
+
+            .media-control[data-media-control] .media-control-layer[data-controls] .media-control-indicator[data-position],
+            .media-control[data-media-control] .media-control-layer[data-controls] .media-control-indicator[data-duration] {
+                color: transparent;
+            }
+
+            .media-control[data-media-control] .media-control-layer[data-controls] .media-control-indicator[data-position]:before {
+                color: hsla(0, 0%, 100%, .5) !important;
+                font-size: 0.7rem;
+            }
+
+            .media-control[data-media-control] .media-control-layer[data-controls] .media-control-indicator[data-position]:before {
+                content: attr(data-content);
+            }
+
+            .bar-fill-2 {
+                background-color: #ff0000 !important;
+            }
+
+            .player-info {
+                will-change: transform !important;
+                transition: opacity .5s ease-out !important;
+                transition-property: opacity, visibility !important;
+                transition-delay: 0s !important;
+                pointer-events: none !important;
+                position: absolute !important;
+                /*width: 100%;*/
+                display: flex !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+                top: 0 !important;
+                opacity: 0;
+                border-left: 2px solid #ff0000 !important;
+                margin: 16px !important;
+                z-index: 99999 !important;
+            }
+
+            .player-info .title-info {
+                padding-left: 1.5vw !important;
+                top: 0 !important;
+                left: 0 !important;
+                text-shadow: 0 0 8px #000 !important
+            }
+
+            .text-truncate {
+                overflow: visible !important;
+                text-overflow: ellipsis !important;
+                margin-block-end: 12px !important;
+                margin-block-start: 12px !important;
+            }
+
+            .display-1, .headline {
+                font-weight: bold !important;
+                letter-spacing: normal !important;
+            }
+
+            .headline {
+                font-size: 1.5rem !important;
+            }
+
+            .subheading {
+                font-size: 1.1rem !important;
+                font-weight: normal !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="player">
+            <!-- <video name="player" width="100%" height="100%" playsinline autoplay controls>
+                Your browser is too old which doesn't support HTML5 video.
+            </video> -->
+        </div>
+
+        <script>
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const guildId = urlParams.get("id");
+            const playerType = urlParams.get("player");
+            const documentTitle = "Video Player";
+            let guildNameTitle = null;
+            const videoUrlBase = `//${window.location.hostname}/streams/${guildId}`;
+            const videoUrlIdle = `/player/idle.mp4`;
+            const clappBaseConfig = {
+                autoPlay: false,
+                loop: false,
+                volume: 0.2,
+                maxBufferLength: 1,
+                preload: "auto",
+                height: "100%",
+                width: "100%"
+            };
+            let clappInstanceConfig = {};
+
+            let clapp;
+            if (playerType === "rtmp") {
+                clappInstanceConfig = {
+                    source: "rtmp:" + videoUrlBase,
+                    plugins: {playback: [RTMP]}
+                };
+            } else if (playerType === "hls") {
+                if (p2pml.hlsjs.Engine.isSupported()) {
+                    const engine = new p2pml.hlsjs.Engine();
+                    clappInstanceConfig = {
+                        parentId: "#player",
+                        playback: {
+                            hlsjsConfig: {
+                                liveSyncDurationCount: 2, // To have at least 7 segments in queue
+                                loader: engine.createLoaderClass()
+                            }
+                        }
+                    };
+                }
+                clappInstanceConfig.source = videoUrlBase + "/index.m3u8";
+            } else if (playerType === "ws-flv") {
+                clappInstanceConfig = {
+                    source: (location.protocol === "https:" ? "wss:" : "ws:") + videoUrlBase + ".flv",
+                    plugins: [FLVJSPlayback],
+                    mimeType: "video/flv"
+                };
+            } else {
+                clappInstanceConfig = {
+                    source: videoUrlBase + ".flv",
+                    plugins: [FLVJSPlayback],
+                    mimeType: "video/flv"
+                };
+            }
+
+            clapp = new Clappr.Player({
+                ...clappBaseConfig,
+                ...clappInstanceConfig
+            });
+
+            // Create player
+            const playerElement = document.getElementById("player");
+            if (playerType === "hls") {
+                p2pml.hlsjs.initClapprPlayer(clapp);
+            } else {
+                clapp.attachTo(playerElement);
+            }
+
+            clapp.setVolume(15)
+            // Set plugins
+            clapp.getPlugin("seek_time").disable();
+            clapp.getPlugin("error_screen").disable();
+            // clapp.getPlugin("click_to_pause").disable();
+            // clapp.getPlugin('spinner_three_bounces').disable();
+
+            let playerInfoBox;
+            if (!playerInfoBox) {
+                const playerBox = $("#player > div[data-player]");
+                playerInfoBox = $(`
+                        <div class="player-info">
+                            <div class="title-info">
+                                <h4 class="headline text-truncate"></h4>
+                                <h5 class="subheading text-truncate"></h5>
+                            </div>
+                        </div>
+                    `);
+                playerBox.append(playerInfoBox);
+            }
+
+            // Watch for class changes, because there is no event emitted when the controls get hidden
+            const $div = $(".media-control");
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (!idle && mutation.attributeName === "class") {
+                        const attributeValue = $(mutation.target).prop(mutation.attributeName);
+                        if (attributeValue.includes("media-control-hide")) {
+                            playerInfoBox.css("opacity", 0);
+                        } else {
+                            playerInfoBox.css("opacity", 1);
+                        }
+                    }
+                });
+            });
+            observer.observe($div[0], {
+                attributes: true
+            });
+            //////////////////////////////////////////////////
+
+            let idle = false;
+            const playStream = () => {
+                idle = false;
+                playerInfoBox.css("opacity", 1);
+                clapp.configure({
+                    ...clappBaseConfig,
+                    ...clappInstanceConfig
+                });
+                clapp.getPlugin("click_to_pause").enable();
+                clapp.once(Clappr.Events.PLAYER_PLAY, () => {
+                    clapp.core.mediaControl.enable();
+                });
+                clapp.play();
+            };
+
+            const playIdle = () => {
+                idle = true;
+                playerInfoBox.css("opacity", 0);
+                document.title = "idle | " + (guildNameTitle ? `${guildNameTitle} | ` : "") + documentTitle;
+                clapp.configure({
+                    source: videoUrlIdle,
+                    mimeType: "video/mp4",
+                    loop: true
+                });
+                clapp.getPlugin("click_to_pause").disable();
+                clapp.once(Clappr.Events.PLAYER_PLAY, () => {
+                    clapp.core.mediaControl.disable();
+                });
+                clapp.play();
+            };
+
+            let pausedByUser = false;
+            clapp.on(Clappr.Events.PLAYER_PAUSE, () => {
+                pausedByUser = true;
+            });
+
+            clapp.on(Clappr.Events.PLAYER_PLAY, () => {
+                if (pausedByUser && !idle) {
+                    playStream();
+                    pausedByUser = false;
+                }
+            });
+
+            const updateInfo = ({info, guildName}) => {
+                guildNameTitle = guildName;
+                document.title = `${info.title || info.filename} | ${guildName} | ${documentTitle}`;
+                $(".headline", playerInfoBox).html(info.title);
+                if (info.uploader || info.webpage_url) {
+                    $(".subheading", playerInfoBox).html(info.uploader || new URL(info.webpage_url).host);
+                }
+            };
+
+            const updateProgress = (data) => {
+                // Set timestamps
+                const progressBox = $(".media-control[data-media-control] .media-control-layer[data-controls] .media-control-indicator[data-position]");
+                progressBox.attr("data-content", `${data.positionString} | ${data.durationString}`);
+
+                // Set Progress bar filled and scrubber
+                const width = `${data.positionSeconds / data.durationSeconds * 100}%`;
+                $(".bar-background .bar-fill-2").css("width", width);
+                $(".bar-scrubber").css("left", width);
+            };
+
+            const startListener = () => {
+                let source = new EventSource(`/events/${guildId}`);
+
+                source.addEventListener("start", function (e) {
+                    updateInfo(JSON.parse(e.data));
+                    playStream();
+                }, false);
+
+                source.addEventListener("pause", function (e) {
+                    clapp.getPlugin('spinner_three_bounces').disable();
+                    clapp.once(Clappr.Events.PLAYBACK_BUFFERING, () => {
+                        clapp.pause();
+                    });
+                }, false);
+
+                source.addEventListener("resume", function (e) {
+                    clapp.getPlugin('spinner_three_bounces').enable();
+                    clapp.play();
+                }, false);
+
+                source.addEventListener("progress", function (e) {
+                    updateProgress(JSON.parse(e.data));
+                }, false);
+
+                source.addEventListener("idle", function (e) {
+                    playIdle();
+                }, false);
+
+                source.addEventListener("end", function (e) {
+                    clapp.once(Clappr.Events.PLAYER_ENDED, () => {
+                        // Ander ding: misschien hoef je niet player.stop() te doen voordat je de source verandert
+                        // Dan blijft hij miss in full-screen
+                        playIdle();
+                    });
+                }, false);
+
+                // source.addEventListener("open", function (e) {
+                //     document.getElementById("state").innerHTML = "Connected";
+                // }, false);
+
+                source.addEventListener("error", function (e) {
+                    if (e.eventPhase === EventSource.CLOSED) {
+                        source.close();
+                    }
+                    if (!idle) {
+                        idle = true;
+                        playIdle();
+                    }
+                    delete source;
+                    setTimeout(() => {
+                        startListener();
+                    }, 1000);
+                }, false);
+            };
+
+            if (!!window.EventSource) {
+                startListener();
+            } else {
+                console.log("Your browser doesn't support SSE. Try using a modern browser.");
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "Lacu",
+  "version": "1.0.0",
+  "description": "A bot for Discord similar to music bots, but with video support on an external website.",
+  "main": "./src/index.js",
+  "repository": "https://github.com/Migushthe2nd/Lacu.git",
+  "author": "Migushthe2nd",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon ./src/index.js"
+  },
+  "nodemonConfig": {
+    "ignore": []
+  },
+  "dependencies": {
+    "@toverux/expresse": "^2.4.0",
+    "discord.js": "^12.5.1",
+    "discord.js-commando": "^0.12.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "got": "^11.8.1",
+    "node-media-server": "https://github.com/Migushthe2nd/Node-Media-Server.git",
+    "puppeteer": "^7.1.0",
+    "youtube-dl": "^3.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
