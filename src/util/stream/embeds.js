@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 
 const base = () => {
     return new Discord.MessageEmbed()
-        .setAuthor("Video Player", `${process.env.WEBSITE_BASEURL}/icon_small.png`, `${process.env.WEBSITE_BASEURL}/`)
+        .setAuthor("Player")
         .setColor("#ff0000");
     // .setTimestamp()
     // .setFooter("Powered by new™ super™ walterspeed™ protocols");
