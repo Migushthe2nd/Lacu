@@ -219,19 +219,6 @@
         //////////////////////////////////////////////////
 
         let idle = false;
-        const playStream = () => {
-            idle = false;
-            playerInfoBox.css("opacity", 1);
-            clapp.configure({
-                ...clappBaseConfig,
-                ...clappInstanceConfig
-            });
-            clapp.getPlugin("click_to_pause").enable();
-            clapp.once(Clappr.Events.PLAYER_PLAY, () => {
-                clapp.core.mediaControl.enable();
-            });
-            clapp.play();
-        };
 
         const playIdle = () => {
             idle = true;
@@ -245,6 +232,21 @@
             clapp.getPlugin("click_to_pause").disable();
             clapp.once(Clappr.Events.PLAYER_PLAY, () => {
                 clapp.core.mediaControl.disable();
+            });
+            clapp.play();
+        };
+        playIdle()
+
+        const playStream = () => {
+            idle = false;
+            playerInfoBox.css("opacity", 1);
+            clapp.configure({
+                ...clappBaseConfig,
+                ...clappInstanceConfig
+            });
+            clapp.getPlugin("click_to_pause").enable();
+            clapp.once(Clappr.Events.PLAYER_PLAY, () => {
+                clapp.core.mediaControl.enable();
             });
             clapp.play();
         };
