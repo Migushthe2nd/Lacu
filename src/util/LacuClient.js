@@ -61,7 +61,7 @@ module.exports = class LacuClient extends Commando.Client {
     loopActivities = () => {
         const activities_list = [
             {
-                name: process.env.PREFIX + "help",
+                name: process.env.PREFIX + " help",
                 type: "LISTENING"
             }
         ];
