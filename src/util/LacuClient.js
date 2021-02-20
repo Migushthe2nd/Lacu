@@ -25,7 +25,7 @@ module.exports = class LacuClient extends Commando.Client {
                 ping_timeout: 60
             },
             http: {
-                port: process.env.PORT,
+                port: process.env.WEBSITE_PORT,
                 allow_origin: process.env.ORIGIN,
                 mediaroot: "./assets/GuildVideoPlayer",
                 api: false
