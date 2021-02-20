@@ -234,7 +234,7 @@ module.exports = class GuildPlayer {
                     this.hasReported = true;
 
                     // Show status on Discord
-                    if (this.guild.id === process.env.MASTER_GUILD) {
+                    if (this.guild.id === process.env.MASTER_GUILD_ID) {
                         await this.message.client.user.setActivity(this.info.title, {
                             type: "WATCHING",
                             url: `https://live.lacu.tk/?id=${this.guild.id}&player=flv&site=https://youtube.com/`
