@@ -9,7 +9,7 @@ const base = () => {
 };
 
 module.exports.nowPlaying = (guildId, info) => {
-    const link = `${process.env.LIVE_BASEURL}/player?id=${guildId}&player=`;
+    const link = `${process.env.LIVE_BASEURL}/?id=${guildId}&player=`;
     const embed = base()
         .setTitle(":arrow_forward:  Now playing:")
         .setDescription(`*${info.title || info.filename}*\n[Source](${info.webpage_url})`)

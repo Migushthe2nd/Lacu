@@ -4,7 +4,7 @@ module.exports = class ResumeCommand extends commando.Command {
     constructor(client) {
         super(client, {
             name: "resume",
-            aliases: ["hervat", "start"],
+            aliases: ["continue"],
             group: "controls",
             memberName: "resume",
             description: "Resume what was already playing.",

@@ -11,8 +11,7 @@ const client = new LacuClient({
 
 client.registry
     .registerGroups([
-        ["other", "Other commands"],
-        ["media", "Media commands"]
+        ["controls", "Player controls"]
     ])
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, "commands"))

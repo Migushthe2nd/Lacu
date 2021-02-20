@@ -237,7 +237,7 @@ module.exports = class GuildPlayer {
                     if (this.guild.id === process.env.MASTER_GUILD) {
                         await this.message.client.user.setActivity(this.info.title, {
                             type: "WATCHING",
-                            url: `https://live.bonteknaagkever.ga/player?id=${this.guild.id}&player=flv&site=https://youtube.com/`
+                            url: `https://live.lacu.tk/?id=${this.guild.id}&player=flv&site=https://youtube.com/`
                         });
                     }
                 }
