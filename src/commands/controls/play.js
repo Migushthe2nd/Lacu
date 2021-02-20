@@ -43,7 +43,7 @@ module.exports = class PlayCommand extends commando.Command {
                 voiceChannel.join()
                     .then(() => {
                         message.guild.me.voice.setDeaf(true);
-                        message.guild.me.voice.setMute(false);
+                        message.guild.me.voice.setMute(true);
                     })
                     .catch(console.error);
             }
