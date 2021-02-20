@@ -26,7 +26,7 @@ module.exports = class LacuClient extends Commando.Client {
             },
             http: {
                 port: process.env.WEBSITE_PORT,
-                allow_origin: process.env.ORIGIN,
+                allow_origin: process.env.WEBSITE_ORIGIN,
                 mediaroot: "./assets/html",
                 api: false
             }
