@@ -1,5 +1,5 @@
 # Lacu
-A bot for Discord similar to music bots, but with video support [on an external website](https://live.lacu.ga/).
+A bot for Discord similar to music bots, but with video support [on an external website](https://live.lacu.tk/).
 
 
 # Getting Started
